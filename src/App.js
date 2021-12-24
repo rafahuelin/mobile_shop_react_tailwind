@@ -1,6 +1,5 @@
-/* eslint-disable */
 import React from 'react'
-import { BrowserRouter, Route, Routes, matchPath, matchRoutes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ListPage from './Pages/ListPage'
 import DetailPage from './Pages/DetailPage'
 
@@ -14,7 +13,6 @@ const data = [
 function App() {
   return (
     <div>
-      <h1>App</h1>
       <BrowserRouter>
         <Routes>
           <Route
