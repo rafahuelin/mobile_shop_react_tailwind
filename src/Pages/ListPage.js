@@ -3,37 +3,19 @@ import React, { useState, useEffect } from 'react'
 import Header from '../Components/Header'
 import ListItem from '../Components/ListItem'
 import Search from '../Components/Search'
+import { isCacheExpired, setCache } from '../utils/cache'
+import { PRODUCTS_URL } from '../api/endpoints'
 
 
-const EXPIRATION_TIME_MS = 60 * 60 * 1000 // 1h
-const PRODUCTS_URL = 'https://front-test-api.herokuapp.com/api/product'
-
-const isCacheExpired = () => {
-  try {
-    const timestamp = JSON.parse(localStorage.getItem('mobilesTimestamp'))
-    const timeNow = new Date().getTime()
-    const timeDifference = timeNow - timestamp
-    if (isNaN(timeDifference)) throw new Error('time difference is NaN')
-    return timeNow - timestamp > EXPIRATION_TIME_MS
-  } catch (error) {
-    console.error(`Error comparing cache expiration: ${error}`)
-    localStorage.removeItem('mobiles')
-    return true
-  }
-}
+const LOCAL_STORAGE_KEY = 'mobiles'
+const TIMESTAMP_KEY = 'mobilesTimestamp'
 
 const ListPage = () => {
   const [mobiles, setMobiles] = useState([])
   const [filteredMobiles, setFilteredMobiles] = useState([])
-
-  const setCache = (data) => {
-    localStorage.setItem('mobiles', JSON.stringify(data))
-    const timeNow = new Date().getTime()
-    localStorage.setItem('mobilesTimestamp', timeNow)
-  }
   
   const fetchFromCache = () => {
-    const jsonData = JSON.parse(localStorage.getItem('mobiles'))
+    const jsonData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
     setMobiles(jsonData)
     setFilteredMobiles(jsonData)
   }
@@ -43,11 +25,11 @@ const ListPage = () => {
     const jsonData = await data.json()
     setMobiles(jsonData)
     setFilteredMobiles(jsonData)
-    setCache(jsonData)
+    setCache(jsonData, LOCAL_STORAGE_KEY, TIMESTAMP_KEY)
   }
 
   useEffect(() => {
-    isCacheExpired() ? fetchFromAPI() : fetchFromCache()
+    isCacheExpired(LOCAL_STORAGE_KEY, TIMESTAMP_KEY) ? fetchFromAPI() : fetchFromCache()
   }, [])
 
   const handleSearch = (event) => {
@@ -77,7 +59,6 @@ const ListPage = () => {
     </div>
   )
 }
-
 
 ListPage.propTypes = {
   data: PropTypes.array
