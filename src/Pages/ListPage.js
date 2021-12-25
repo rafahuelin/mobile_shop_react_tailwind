@@ -36,7 +36,6 @@ const ListPage = () => {
     const jsonData = JSON.parse(localStorage.getItem('mobiles'))
     setMobiles(jsonData)
     setFilteredMobiles(jsonData)
-    setCache(jsonData)
   }
   
   const fetchFromAPI = async() => {
