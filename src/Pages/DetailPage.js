@@ -5,15 +5,16 @@ import Header from '../Components/Header'
 import { isCacheExpired, setCache } from '../utils/cache'
 import { PRODUCTS_URL } from '../api/endpoints'
 
+
 const DetailPage = () => {
-  const tempMobile = {
+  const emptyMobile = {
     options: {
       storages: ['-'],
       colors: ['-']
     }
   }
   const emptySelection = {code: '-', name: '-'}
-  const [mobile, setMobile] = useState(tempMobile)
+  const [mobile, setMobile] = useState(emptyMobile)
   const [selectedColor, setSelectedColor] = useState(emptySelection)
   const [selectedStorage, setSelectedStorage] = useState(emptySelection)
   const { id } = useParams()
@@ -106,7 +107,7 @@ const DetailPage = () => {
               {mobile.options.colors.map(el => <option key={`color${el.code}`} value={el.code}>{el.name}</option>)}
             </select>
             <button
-              className="mt-8 bg-teal-500 hover:bg-teal-400 text-white font-bold px-3 mt-3 border border-teal-700 rounded"
+              className='mt-8 bg-teal-500 hover:bg-teal-400 text-white font-bold px-3 mt-3 border border-teal-700 rounded'
               onClick={handleAddToCart}
             >
               Add to Cart
