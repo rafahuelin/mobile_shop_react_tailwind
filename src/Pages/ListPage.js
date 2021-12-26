@@ -4,32 +4,32 @@ import Header from '../Components/Header'
 import ListItem from '../Components/ListItem'
 import Search from '../Components/Search'
 import { isCacheExpired, setCache } from '../utils/cache'
-import { PRODUCTS_URL } from '../api/endpoints'
+import { BASE_URL, PRODUCTS_ENDPOINT } from '../api/endpoints'
 
 
-const LOCAL_STORAGE_KEY = 'mobiles'
-const TIMESTAMP_KEY = 'mobilesTimestamp'
+const LOCAL_STORAGE_MOBILE_KEY = 'mobiles'
+const TIMESTAMP_MOBILE_KEY = 'mobilesTimestamp'
 
 const ListPage = () => {
   const [mobiles, setMobiles] = useState([])
   const [filteredMobiles, setFilteredMobiles] = useState([])
   
   const fetchFromCache = () => {
-    const jsonData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
+    const jsonData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_MOBILE_KEY))
     setMobiles(jsonData)
     setFilteredMobiles(jsonData)
   }
   
   const fetchFromAPI = async() => {
-    const data = await fetch(PRODUCTS_URL)
+    const data = await fetch(`${BASE_URL}${PRODUCTS_ENDPOINT}`)
     const jsonData = await data.json()
     setMobiles(jsonData)
     setFilteredMobiles(jsonData)
-    setCache(jsonData, LOCAL_STORAGE_KEY, TIMESTAMP_KEY)
+    setCache(jsonData, LOCAL_STORAGE_MOBILE_KEY, TIMESTAMP_MOBILE_KEY)
   }
 
   useEffect(() => {
-    isCacheExpired(LOCAL_STORAGE_KEY, TIMESTAMP_KEY) ? fetchFromAPI() : fetchFromCache()
+    isCacheExpired(LOCAL_STORAGE_MOBILE_KEY, TIMESTAMP_MOBILE_KEY) ? fetchFromAPI() : fetchFromCache()
   }, [])
 
   const handleSearch = (event) => {
@@ -54,7 +54,6 @@ const ListPage = () => {
             { filteredMobiles.map(mobile => <ListItem key={mobile.id} mobile={mobile} />) }
           </div>
         </div>
-        
       </div>
     </div>
   )

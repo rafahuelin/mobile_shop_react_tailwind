@@ -3,8 +3,11 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Header from '../Components/Header'
 import { isCacheExpired, setCache } from '../utils/cache'
-import { PRODUCTS_URL } from '../api/endpoints'
+import { BASE_URL, CART_ENDPOINT, PRODUCTS_ENDPOINT } from '../api/endpoints'
 
+
+const LOCAL_STORAGE_CART_KEY = 'cart'
+const TIMESTAMP_CART_KEY = 'cartTimestamp'
 
 const DetailPage = () => {
   const emptyMobile = {
@@ -14,34 +17,39 @@ const DetailPage = () => {
     }
   }
   const emptySelection = {code: '-', name: '-'}
-  const [mobile, setMobile] = useState(emptyMobile)
-  const [selectedColor, setSelectedColor] = useState(emptySelection)
-  const [selectedStorage, setSelectedStorage] = useState(emptySelection)
+  
   const { id } = useParams()
   const LOCAL_STORAGE_KEY = `mobile_${id}`
   const TIMESTAMP_KEY = `mobileTimestamp_${id}`
+  const cartDefaultValue = parseInt(localStorage.getItem(LOCAL_STORAGE_CART_KEY)) || 0
 
-  const fetchFromCache = () => {
-    const jsonData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
+  const [mobile, setMobile] = useState(emptyMobile)
+  const [selectedColor, setSelectedColor] = useState(emptySelection)
+  const [selectedStorage, setSelectedStorage] = useState(emptySelection)
+  const [cartCount, setCartCount] = useState(cartDefaultValue)
+
+  const fetchFromCache = async() => {
+    const jsonData = await JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
     setMobile(jsonData)
-    setSelectedColor(mobile.options.colors[0])
-    setSelectedStorage(mobile.options.storages[0])
   }
 
   const fetchFromAPI = async() => {
-    const data = await fetch(`${PRODUCTS_URL}/${id}`)
+    const data = await fetch(`${BASE_URL}${PRODUCTS_ENDPOINT}/${id}`)
     const jsonData = await data.json()
     setMobile(jsonData)
     setCache(jsonData, LOCAL_STORAGE_KEY, TIMESTAMP_KEY)
-    setSelectedColor(mobile.options.colors[0])
-    setSelectedStorage(mobile.options.storages[0])
   }
 
   useEffect(() => {
     isCacheExpired(LOCAL_STORAGE_KEY, TIMESTAMP_KEY) ? fetchFromAPI() : fetchFromCache()
+    isCacheExpired(LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY) && setCache(0, LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY)
   }, [])
 
-  
+
+  useEffect(() => {
+    setSelectedColor(mobile.options.colors[0])
+    setSelectedStorage(mobile.options.storages[0])
+  }, [mobile])
 
   const handleSelectedColor = (event) => {
     const colorOption = mobile.options.colors.find(color => color.code.toString() === event.target.value)
@@ -53,20 +61,37 @@ const DetailPage = () => {
     setSelectedStorage(storageOption)
   }
 
-  const handleAddToCart = () => {
+  const postCart = async(addToCartBody) => {
+    const response = await fetch(`${BASE_URL}${CART_ENDPOINT}`, {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(addToCartBody)
+    })
+    const jsonResponse = await response.json()
+    return jsonResponse
+  }
+
+  const handleAddToCart = async() => {
     const addToCartBody = {
       id: mobile.id,
       colorCode: selectedColor.code,
       storageCode: selectedStorage.code
     }
 
-    console.log('*** addToCartBody', addToCartBody)
-    // TODO: Post Request with body to endpoint https://front-test-api.herokuapp.com/api/cart
+    const jsonData = await postCart(addToCartBody)
+    isCacheExpired(LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY) && setCache(0, LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY)
+    const count = jsonData.count + parseInt(localStorage.getItem(LOCAL_STORAGE_CART_KEY))
+    setCache(count, LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY)
+    setCartCount(count)
   }
 
   return (
     <>
-      <Header />
+      <Header cartCount={cartCount} />
       <div className='px-10 pb-5'>Detail Page:</div>
       <div className='min-w-[260px] md:px-10 sm:px-5 grid grid-cols-1 sm:grid-cols-2'>
         <img className='min-w-[200px] w-[400px] px-10 mb-5' src={mobile.imgUrl} alt={`${mobile.brand}-${mobile.model}`} />
