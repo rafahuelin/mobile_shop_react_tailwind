@@ -93,7 +93,6 @@ const DetailPage = () => {
     <div className='relative'>
       <div className="px-0 sm:px-5 lg:px-10 items-stretch">
         <Header cartCount={cartCount} />
-        <div className='px-10 pb-5'>Detail Page:</div>
         <div className='min-w-[350px] px-10 sm:px-10 md:pr-10 grid grid-cols-1 sm:grid-cols-2 grow'>
           <img 
             className='min-w-[200px] w-[400px] pr-10 mb-5'
