@@ -90,57 +90,62 @@ const DetailPage = () => {
   }
 
   return (
-    <>
-      <Header cartCount={cartCount} />
-      <div className='px-10 pb-5'>Detail Page:</div>
-      <div className='min-w-[260px] md:px-10 sm:px-5 grid grid-cols-1 sm:grid-cols-2'>
-        <img className='min-w-[200px] w-[400px] px-10 mb-5' src={mobile.imgUrl} alt={`${mobile.brand}-${mobile.model}`} />
-        <div>
+    <div className='relative'>
+      <div className="px-0 sm:px-5 lg:px-10 items-stretch">
+        <Header cartCount={cartCount} />
+        <div className='px-10 pb-5'>Detail Page:</div>
+        <div className='min-w-[350px] px-10 sm:px-10 md:pr-10 grid grid-cols-1 sm:grid-cols-2 grow'>
+          <img 
+            className='min-w-[200px] w-[400px] pr-10 mb-5'
+            src={mobile.imgUrl} alt={`${mobile.brand}-${mobile.model}`}
+          />
+          <div>
 
-          <div
-            className='p-5 rounded border-2 border-teal-200 shadow:shadow-2xl text-neutral-600 h-80 mb-5'
-          >  
-            <div>Description:</div>
-            <div className='max-w-sm pb-10'>
-              <ul className='list-disc text-xs pl-5'>
-                <li>Brand: {mobile.brand}</li>
-                <li>Model: {mobile.model}</li>
-                <li>Price: {mobile.price} €</li>
-                <li>CPU: {mobile.cpu}</li>
-                <li>RAM: {mobile.ram}</li>
-                <li>OS: {mobile.os}</li>
-                <li>Display Resolution: {mobile.displayResolution}</li>
-                <li>Battery: {mobile.battery}</li>
-                <li>Primary Camera: {mobile.primaryCamera}</li>
-                <li>Secondary Camera: {mobile.secondaryCmera}</li>
-                <li>Dimensions: {mobile.dimentions}</li>
-                <li>Weight: {mobile.weight} g</li>
-              </ul>
+            <div
+              className='p-5 rounded border-2 border-teal-200 text-neutral-600 h-80 mb-5'
+            >  
+              <div>Description:</div>
+              <div className='max-w-sm pb-10'>
+                <ul className='list-disc text-xs pl-5'>
+                  <li>Brand: {mobile.brand}</li>
+                  <li>Model: {mobile.model}</li>
+                  <li>Price: {mobile.price} €</li>
+                  <li>CPU: {mobile.cpu}</li>
+                  <li>RAM: {mobile.ram}</li>
+                  <li>OS: {mobile.os}</li>
+                  <li>Display Resolution: {mobile.displayResolution}</li>
+                  <li>Battery: {mobile.battery}</li>
+                  <li>Primary Camera: {mobile.primaryCamera}</li>
+                  <li>Secondary Camera: {mobile.secondaryCmera}</li>
+                  <li>Dimensions: {mobile.dimentions}</li>
+                  <li>Weight: {mobile.weight} g</li>
+                </ul>
+              </div>
             </div>
-          </div>
 
-          <div
-            className='p-5 rounded border-2 border-teal-200 shadow:shadow-2xl text-neutral-600 h-80 grid justify-items-stretch'
-          >
-            <div>Actions:</div>
-            <label htmlFor='storage'>Choose a storage: </label>
-            <select name='storage' id='storage' value={selectedStorage.code} onChange={handleSelectedStorage}>
-              {mobile.options.storages.map(el => <option key={`storage_${el.code}`} value={el.code}>{el.name}</option>)}
-            </select>
-            <label className='mt-5' htmlFor='color'>Choose a color: </label>
-            <select name='color' id='color' value={selectedColor.code} onChange={handleSelectedColor}>
-              {mobile.options.colors.map(el => <option key={`color${el.code}`} value={el.code}>{el.name}</option>)}
-            </select>
-            <button
-              className='mt-8 bg-teal-500 hover:bg-teal-400 text-white font-bold px-3 mt-3 border border-teal-700 rounded'
-              onClick={handleAddToCart}
+            <div
+              className='p-5 rounded border-2 border-teal-200 shadow:shadow-2xl text-neutral-600 h-80 grid justify-items-stretch'
             >
-              Add to Cart
-            </button>
+              <div>Actions:</div>
+              <label htmlFor='storage'>Choose a storage: </label>
+              <select name='storage' id='storage' value={selectedStorage.code} onChange={handleSelectedStorage}>
+                {mobile.options.storages.map(el => <option key={`storage_${el.code}`} value={el.code}>{el.name}</option>)}
+              </select>
+              <label className='mt-5' htmlFor='color'>Choose a color: </label>
+              <select name='color' id='color' value={selectedColor.code} onChange={handleSelectedColor}>
+                {mobile.options.colors.map(el => <option key={`color${el.code}`} value={el.code}>{el.name}</option>)}
+              </select>
+              <button
+                className='mt-8 bg-teal-500 hover:bg-teal-400 text-white font-bold px-3 mt-3 border border-teal-700 rounded'
+                onClick={handleAddToCart}
+              >
+                  Add to Cart
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

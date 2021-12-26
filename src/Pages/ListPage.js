@@ -46,11 +46,11 @@ const ListPage = () => {
 
   return (
     <div className='relative'>
-      <div className="px-0 sm:px-5 md:px-10 items-stretch">
+      <div className="px-0 sm:px-5 lg:px-10 items-stretch">
         <Header />
         <div className='min-w-min'>
           <Search handleSearch={handleSearch} />
-          <div className="p-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 grow">
+          <div className="p-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 grow">
             { filteredMobiles.map(mobile => <ListItem key={mobile.id} mobile={mobile} />) }
           </div>
         </div>
