@@ -3,6 +3,9 @@
 
 This is a mobiles shop app with basic cart and custom cache system (leveraging Local Storage) to optimize the requests made to the Backend 
 
+## Stack
+* React
+* TailwindCSS
 
 # Getting Started with Create React App
 
