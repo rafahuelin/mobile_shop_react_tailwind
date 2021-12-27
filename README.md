@@ -1,3 +1,9 @@
+# Mobile Shop made with React and TailwindCSS
+![First Step](src/assets/img/demo-mobiles.gif "Mobile Shop with React and TailwindCSS")
+
+This is a mobiles shop app with basic cart and custom cache system (leveraging Local Storage) to optimize the requests made to the Backend 
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -28,6 +34,10 @@ The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run lint`
+
+Checks if there is any linting error in the app
 
 ### `npm run eject`
 
