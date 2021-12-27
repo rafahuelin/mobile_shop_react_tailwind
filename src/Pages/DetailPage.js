@@ -1,13 +1,15 @@
-import PropTypes from 'prop-types'
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import Header from '../Components/Header'
-import { isCacheExpired, setCache } from '../utils/cache'
+import {
+  initCartStore,
+  isCacheExpired,
+  setCache,
+  LOCAL_STORAGE_CART_KEY,
+  TIMESTAMP_CART_KEY,
+} from '../utils/cache'
 import { BASE_URL, CART_ENDPOINT, PRODUCTS_ENDPOINT } from '../api/endpoints'
 
-
-const LOCAL_STORAGE_CART_KEY = 'cart'
-const TIMESTAMP_CART_KEY = 'cartTimestamp'
 
 const DetailPage = () => {
   const emptyMobile = {
@@ -17,21 +19,25 @@ const DetailPage = () => {
     }
   }
   const emptySelection = {code: '-', name: '-'}
-  
   const { id } = useParams()
   const LOCAL_STORAGE_KEY = `mobile_${id}`
   const TIMESTAMP_KEY = `mobileTimestamp_${id}`
   const cartDefaultValue = parseInt(localStorage.getItem(LOCAL_STORAGE_CART_KEY)) || 0
 
+  const [cartCount, setCartCount] = useState(cartDefaultValue)
   const [mobile, setMobile] = useState(emptyMobile)
   const [selectedColor, setSelectedColor] = useState(emptySelection)
   const [selectedStorage, setSelectedStorage] = useState(emptySelection)
-  const [cartCount, setCartCount] = useState(cartDefaultValue)
 
-  const fetchFromCache = async() => {
-    const jsonData = await JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
-    setMobile(jsonData)
-  }
+  useEffect(() => {
+    isCacheExpired(LOCAL_STORAGE_KEY, TIMESTAMP_KEY) ? fetchFromAPI() : fetchFromCache()
+    initCartStore()
+  }, [])
+
+  useEffect(() => {
+    setSelectedColor(mobile.options.colors[0])
+    setSelectedStorage(mobile.options.storages[0])
+  }, [mobile])
 
   const fetchFromAPI = async() => {
     const data = await fetch(`${BASE_URL}${PRODUCTS_ENDPOINT}/${id}`)
@@ -40,16 +46,24 @@ const DetailPage = () => {
     setCache(jsonData, LOCAL_STORAGE_KEY, TIMESTAMP_KEY)
   }
 
-  useEffect(() => {
-    isCacheExpired(LOCAL_STORAGE_KEY, TIMESTAMP_KEY) ? fetchFromAPI() : fetchFromCache()
+  const fetchFromCache = async() => {
+    const jsonData = await JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
+    setMobile(jsonData)
+  }
+
+  const handleAddToCart = async() => {
+    const addToCartBody = {
+      id: mobile.id,
+      colorCode: selectedColor.code,
+      storageCode: selectedStorage.code
+    }
+
+    const jsonData = await postCart(addToCartBody)
     isCacheExpired(LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY) && setCache(0, LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY)
-  }, [])
-
-
-  useEffect(() => {
-    setSelectedColor(mobile.options.colors[0])
-    setSelectedStorage(mobile.options.storages[0])
-  }, [mobile])
+    const count = jsonData.count + parseInt(localStorage.getItem(LOCAL_STORAGE_CART_KEY)) || 0
+    setCache(count, LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY)
+    setCartCount(count)
+  }
 
   const handleSelectedColor = (event) => {
     const colorOption = mobile.options.colors.find(color => color.code.toString() === event.target.value)
@@ -73,20 +87,6 @@ const DetailPage = () => {
     })
     const jsonResponse = await response.json()
     return jsonResponse
-  }
-
-  const handleAddToCart = async() => {
-    const addToCartBody = {
-      id: mobile.id,
-      colorCode: selectedColor.code,
-      storageCode: selectedStorage.code
-    }
-
-    const jsonData = await postCart(addToCartBody)
-    isCacheExpired(LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY) && setCache(0, LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY)
-    const count = jsonData.count + parseInt(localStorage.getItem(LOCAL_STORAGE_CART_KEY))
-    setCache(count, LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY)
-    setCartCount(count)
   }
 
   return (
@@ -146,10 +146,6 @@ const DetailPage = () => {
       </div>
     </div>
   )
-}
-
-DetailPage.propTypes = {
-  data: PropTypes.array
 }
 
 export default DetailPage

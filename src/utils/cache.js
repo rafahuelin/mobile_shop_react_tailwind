@@ -1,4 +1,14 @@
 export const EXPIRATION_TIME_MS = 60 * 60 * 1000 // 1h
+export const LOCAL_STORAGE_CART_KEY = 'cart'
+export const LOCAL_STORAGE_MOBILE_KEY = 'mobiles'
+export const TIMESTAMP_CART_KEY = 'cartTimestamp'
+export const TIMESTAMP_MOBILE_KEY = 'mobilesTimestamp'
+
+
+export const initCartStore = () => {
+  (!isCartStorageSet || isNaN(parseInt(localStorage.getItem(LOCAL_STORAGE_CART_KEY)))) && resetCartStore()
+  isCacheExpired(LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY) && resetCartStore()
+}
 
 export const isCacheExpired = (localStorageKey, timestampKey) => {
   try {
@@ -13,6 +23,12 @@ export const isCacheExpired = (localStorageKey, timestampKey) => {
     localStorage.removeItem(localStorageKey)
     return true
   }
+}
+
+export const isCartStorageSet = () => localStorage.getItem(LOCAL_STORAGE_CART_KEY) !== null
+  
+export const resetCartStore = () => {
+  setCache(0, LOCAL_STORAGE_CART_KEY, TIMESTAMP_CART_KEY)
 }
 
 export const setCache = (data, localStorageKey, timestampKey) => {

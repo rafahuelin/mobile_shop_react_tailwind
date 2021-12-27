@@ -1,18 +1,29 @@
-import PropTypes from 'prop-types'
 import React, { useState, useEffect } from 'react'
 import Header from '../Components/Header'
 import ListItem from '../Components/ListItem'
 import Search from '../Components/Search'
-import { isCacheExpired, setCache } from '../utils/cache'
+import {
+  initCartStore,
+  isCacheExpired,
+  setCache,
+  LOCAL_STORAGE_CART_KEY,
+  LOCAL_STORAGE_MOBILE_KEY,
+  TIMESTAMP_MOBILE_KEY,
+} from '../utils/cache'
 import { BASE_URL, PRODUCTS_ENDPOINT } from '../api/endpoints'
 
 
-const LOCAL_STORAGE_MOBILE_KEY = 'mobiles'
-const TIMESTAMP_MOBILE_KEY = 'mobilesTimestamp'
-
 const ListPage = () => {
+  const [cartCount, setCartCount] = useState('0')
   const [mobiles, setMobiles] = useState([])
   const [filteredMobiles, setFilteredMobiles] = useState([])
+
+  useEffect(() => {
+    initCartStore()
+    isCacheExpired(LOCAL_STORAGE_MOBILE_KEY, TIMESTAMP_MOBILE_KEY) ? fetchFromAPI() : fetchFromCache()
+    const cartCachedValue = localStorage.getItem(LOCAL_STORAGE_CART_KEY)
+    setCartCount(cartCachedValue)
+  }, [])
   
   const fetchFromCache = () => {
     const jsonData = JSON.parse(localStorage.getItem(LOCAL_STORAGE_MOBILE_KEY))
@@ -27,10 +38,6 @@ const ListPage = () => {
     setFilteredMobiles(jsonData)
     setCache(jsonData, LOCAL_STORAGE_MOBILE_KEY, TIMESTAMP_MOBILE_KEY)
   }
-
-  useEffect(() => {
-    isCacheExpired(LOCAL_STORAGE_MOBILE_KEY, TIMESTAMP_MOBILE_KEY) ? fetchFromAPI() : fetchFromCache()
-  }, [])
 
   const handleSearch = (event) => {
     const searchValue = event.target.value.toLowerCase()
@@ -47,7 +54,7 @@ const ListPage = () => {
   return (
     <div className='relative'>
       <div className="px-0 sm:px-5 lg:px-10 items-stretch">
-        <Header />
+        <Header cartCount={cartCount} />
         <div className='min-w-min'>
           <Search handleSearch={handleSearch} />
           <div className="p-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 grow">
@@ -57,10 +64,6 @@ const ListPage = () => {
       </div>
     </div>
   )
-}
-
-ListPage.propTypes = {
-  data: PropTypes.array
 }
 
 export default ListPage
